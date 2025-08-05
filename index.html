@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RCCM 問題2</title>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RCCM 問題2</title>
+<style>
         body { font-family: Arial, sans-serif; margin: 0; background-color: #f9f9f9; color: #333; display: flex; flex-direction: column; height: 100vh; }
         .container { flex: 1; overflow-y: auto; padding: 20px; max-width: 600px; margin: auto; }
         h1 { text-align: center; margin-bottom: 20px; }
@@ -17,20 +18,17 @@
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h1>RCCM 問題2</h1>
-    <div id="question" class="question"></div>
-    <div id="choices" class="choices"></div>
-    <div id="result" class="result"></div>
-    <div id="explanation" class="explanation"></div>
+<h1>RCCM 問題2</h1>
+<div class="question" id="question"></div>
+<div class="choices" id="choices"></div>
+<div class="result" id="result"></div>
+<div class="explanation" id="explanation"></div>
 </div>
-
 <div class="footer">
-    <button id="nextButton">次の問題</button>
-    <button id="resetButton">リセット</button>
+<button id="nextButton">次の問題</button>
+<button id="resetButton">リセット</button>
 </div>
-
 <script>
 const questions = [
   {
@@ -1963,20 +1961,23 @@ function checkAnswer(selected, correct, year, explanation, question) {
 document.getElementById('nextButton').onclick = () => {
     if (remainingQuestions.length > 0) {
         currentQuestionIndex = Math.floor(Math.random() * remainingQuestions.length);
-        showQuestion();
+        currentQuestionIndex = Math.floor(Math.random() * remainingQuestions.length);
+showQuestion();
     } else {
-        showQuestion();
+        currentQuestionIndex = Math.floor(Math.random() * remainingQuestions.length);
+showQuestion();
     }
 };
 
 document.getElementById('resetButton').onclick = () => {
     remainingQuestions = [...questions];
     currentQuestionIndex = 0;
-    showQuestion();
+    currentQuestionIndex = Math.floor(Math.random() * remainingQuestions.length);
+showQuestion();
 };
 
+currentQuestionIndex = Math.floor(Math.random() * remainingQuestions.length);
 showQuestion();
 </script>
-
 </body>
 </html>
