@@ -83,16 +83,13 @@
 
 <div id="imgModal"><img alt=""></div>
 
-<!-- データ配列 -->
+<!-- 集約配列 -->
 <script>window.PROBLEMS_CHUNKS = window.PROBLEMS_CHUNKS || [];</script>
 
-<!-- 問題2専用ファイルのみを読む（存在するものだけOK） -->
+<!-- 問題2のみ読み込む -->
 <script>
 (function(){
-  const files = [
-    'problems2_chunk1_of4.js','problems2_chunk2_of4.js',
-    'problems2_chunk3_of4.js','problems2_chunk4_of4.js'
-  ];
+  const files=['problems2_chunk1_of4.js','problems2_chunk2_of4.js','problems2_chunk3_of4.js','problems2_chunk4_of4.js'];
   const status=[]; let left=files.length;
   function done(){ if(--left===0) window.dispatchEvent(new Event('chunks:ready')); }
   files.forEach(f=>{
@@ -122,30 +119,28 @@
 
   let correctSet=new Set(JSON.parse(localStorage.getItem(STORAGE_CORRECT)||'[]'));
   let ALL=[]; let ORDER=[]; let IDX=0; let current=null;
+  let didInit=false;
 
   function normalize(q){
     return {
-      id: String(q.id ?? `${q.year}-${q.number}`),
-      year: Number(q.year ?? 0),
-      yearDisplay: String(q.yearDisplay ?? ''),
-      number: Number(q.number ?? 0),
-      question: String(q.question ?? ''),
-      image: String(q.image ?? ''),
-      choices: Array.isArray(q.choices)? q.choices.map(String):[],
-      correct: Number.isInteger(q.correct)? q.correct : -1,
-      explanation: String(q.explanation ?? '')
+      id:String(q.id ?? `${q.year}-${q.number}`),
+      year:Number(q.year ?? 0),
+      yearDisplay:String(q.yearDisplay ?? ''),
+      number:Number(q.number ?? 0),
+      question:String(q.question ?? ''),
+      image:String(q.image ?? ''),
+      choices:Array.isArray(q.choices)? q.choices.map(String):[],
+      correct:Number.isInteger(q.correct)? q.correct : -1,
+      explanation:String(q.explanation ?? '')
     }
   }
 
   function loadProblems(){
-    const src = Array.isArray(window.PROBLEMS_CHUNKS)? window.PROBLEMS_CHUNKS : [];
-    const all = [];
-    for(const chunk of src){ if(Array.isArray(chunk)) all.push(...chunk); }
-    // 正規化＋重複排除（id が無ければ year-number で）
+    const src=Array.isArray(window.PROBLEMS_CHUNKS)? window.PROBLEMS_CHUNKS: [];
+    const all=[]; for(const ch of src){ if(Array.isArray(ch)) all.push(...ch); }
     const map=new Map();
     for(const raw of all){
-      const n=normalize(raw);
-      const key=n.id || `${n.year}-${n.number}`;
+      const n=normalize(raw); const key=n.id || `${n.year}-${n.number}`;
       if(!map.has(key)) map.set(key,n);
     }
     return [...map.values()].filter(x=>x.choices.length);
@@ -155,18 +150,11 @@
     const ys=[...new Set(ALL.map(x=>x.year))].sort((a,b)=>a-b);
     const map=new Map(ALL.map(x=>[x.year,x.yearDisplay]));
     yearFilter.innerHTML='';
-    const opAll=document.createElement('option'); opAll.value=''; opAll.textContent='全年度';
-    yearFilter.appendChild(opAll);
-    ys.forEach(y=>{
-      const op=document.createElement('option');
-      op.value=String(y); op.textContent=map.get(y)||y;
-      yearFilter.appendChild(op);
-    });
+    const opA=document.createElement('option'); opA.value=''; opA.textContent='全年度';
+    yearFilter.appendChild(opA);
+    ys.forEach(y=>{ const op=document.createElement('option'); op.value=String(y); op.textContent=map.get(y)||y; yearFilter.appendChild(op); });
     yearFilter.value=localStorage.getItem('rccm2_year')||'';
-    yearFilter.addEventListener('change',()=>{
-      localStorage.setItem('rccm2_year',yearFilter.value);
-      makeOrder(true); showAt(0);
-    });
+    yearFilter.addEventListener('change',()=>{ localStorage.setItem('rccm2_year',yearFilter.value); makeOrder(true); showAt(0); });
   }
 
   function filteredPool(){
@@ -175,12 +163,14 @@
     if(y) pool=pool.filter(q=>String(q.year)===y);
     return pool;
   }
-
-  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 
   function makeOrder(save){
     ORDER=shuffle(filteredPool().map(q=>q.id)); IDX=0;
-    if(save){ localStorage.setItem(STORAGE_ORDER,JSON.stringify(ORDER)); localStorage.setItem(STORAGE_INDEX',String(IDX)); }
+    if(save){
+      localStorage.setItem(STORAGE_ORDER,JSON.stringify(ORDER));
+      localStorage.setItem(STORAGE_INDEX, String(IDX)); /* ← 修正ポイント */
+    }
     updateKPI();
   }
 
@@ -188,7 +178,7 @@
     if(!src) return '';
     if(src.startsWith('data:image/page')){
       if(src.includes('.png;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/png;base64,');
-      if(src.includes('.jpe?g;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/jpeg;base64,');
+      if(src.includes('.jpeg;base64,') || src.includes('.jpg;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/jpeg;base64,');
     }
     return src;
   }
@@ -198,16 +188,14 @@
       qEl.textContent='出題可能な問題がありません。リセットしてください。';
       imgWrap.style.display='none'; imgEl.removeAttribute('src');
       choicesEl.innerHTML=''; resultEl.textContent=''; explainEl.innerHTML='';
-      metaEl.textContent=''; metaREl.textContent='';
-      return;
+      metaEl.textContent=''; metaREl.textContent=''; return;
     }
     metaEl.textContent=`${q.yearDisplay} / No.${q.number}`;
     metaREl.textContent=`ID: ${q.id}`;
     qEl.textContent=q.question;
 
     const src=normalizeDataUri(q.image||'').trim();
-    if(src){ imgEl.onerror=()=>{imgEl.removeAttribute('src'); imgWrap.style.display='none';};
-             imgEl.src=src; imgWrap.style.display='flex'; }
+    if(src){ imgEl.onerror=()=>{imgEl.removeAttribute('src'); imgWrap.style.display='none';}; imgEl.src=src; imgWrap.style.display='flex'; }
     else { imgEl.removeAttribute('src'); imgWrap.style.display='none'; }
 
     imgEl.onclick=()=>{ if(!imgEl.src) return; imgModalImg.src=imgEl.src; imgModal.style.display='flex'; };
@@ -215,7 +203,7 @@
 
     choicesEl.innerHTML=''; resultEl.textContent=''; resultEl.className='result'; explainEl.innerHTML='';
     q.choices.forEach((tx,i)=>{
-      const div=document.createElement('div'); div.className='choice'; div.dataset.index=i;
+      const div=document.createElement('div'); div.className='choice';
       const b=document.createElement('div'); b.className='bullet'; b.textContent=['a','b','c','d','e','f'][i]||String(i+1);
       const t=document.createElement('div'); t.className='ctext'; t.textContent=tx;
       div.appendChild(b); div.appendChild(t);
@@ -265,9 +253,12 @@
     prevBtn.disabled=(IDX<=0); nextBtn.disabled=(IDX>=ORDER.length-1);
   }
 
-  prevBtn.addEventListener('click',prev); nextBtn.addEventListener('click',next); resetBtn.addEventListener('click',resetProgress);
+  prevBtn.addEventListener('click',()=>{ if(ORDER.length) showAt(IDX-1); });
+  nextBtn.addEventListener('click',()=>{ if(ORDER.length) showAt(IDX+1); });
+  resetBtn.addEventListener('click',resetProgress);
 
   function init(){
+    if(didInit) return; didInit=true;
     ALL=loadProblems();
     if(!ALL.length){
       const st=(window.__chunk_status||[]).map(([m,f])=>`${m} ${f}`).join('\n')||'（結果なし）';
@@ -281,6 +272,8 @@
     cardEl.hidden=false; showAt(0);
   }
   window.addEventListener('chunks:ready',init);
+  // 念のためのフォールバック（読み込みイベントが飛ばなかった場合）
+  window.addEventListener('DOMContentLoaded',()=>setTimeout(init,3000));
 })();
 </script>
 </body>
