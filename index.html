@@ -6,50 +6,68 @@
   <title>RCCM 問題2</title>
   <style>
     [hidden]{display:none!important}
-    :root{--bg:#f6f9ff; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#2563eb; --ok:#16a34a; --bad:#ef4444; --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.08)}
+
+    :root{
+      --bg:#f6f9ff; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+      --line:#e2e8f0; --brand:#2563eb; --ok:#16a34a; --bad:#ef4444;
+      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.08);
+    }
     *{box-sizing:border-box}
-    html,body{padding-bottom:calc(76px + env(safe-area-inset-bottom)); height:100%}
-    body{margin:0; background:linear-gradient(180deg,#f6f9ff,#eef4ff 40%,#f6f9ff); color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,"Noto Sans JP",sans-serif; overflow:auto}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#f6f9ff,#eef4ff 40%,#f6f9ff);
+      color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,"Noto Sans JP",sans-serif;
+      padding-bottom:calc(76px + env(safe-area-inset-bottom));
+      overflow:auto;
+    }
     .wrap{min-height:100vh; display:flex; flex-direction:column}
     header{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.7); backdrop-filter:blur(6px); border-bottom:1px solid var(--line)}
     .container{max-width:960px; margin:0 auto; padding:12px 16px}
     .row{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
     .title{flex:1; text-align:center; font-weight:800; letter-spacing:.02em; font-size:clamp(20px,4.6vw,28px); color:#0b3ea8}
-    .kpi{display:flex; gap:10px; color:var(--muted); font-size:.9rem}
+    .kpi{display:flex; gap:10px; color:var(--muted); font-size:.9rem; align-items:center}
     .kpi b{color:var(--ink)}
     select,button{appearance:none; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink); padding:10px 12px; font-weight:600}
     select{padding-right:28px}
+
     main{flex:1;}
     .inner{max-width:960px; margin:14px auto; padding:0 16px;}
-    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; display:flex; flex-direction:column; gap:10px}
-    .meta{display:flex; align-items:center; justify-content:space-between; color:var(--muted)}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; display:flex; flex-direction:column; gap:12px}
+    .meta{display:flex; align-items:center; justify-content:space-between; color:var(--muted); flex-wrap:wrap; gap:6px}
     .qwrap{display:flex; gap:12px}
     .qleft{flex:1; min-width:0; display:flex; flex-direction:column; gap:12px}
-    .qtext{padding:10px; border:1px solid var(--line); border-radius:12px; background:#fafcff; line-height:1.7}
+    .qtext{padding:10px; border:1px solid var(--line); border-radius:12px; background:#fafcff; line-height:1.7; white-space:pre-wrap; word-break:break-word}
     .imgbox{display:none; justify-content:center}
     .imgbox img{max-width:100%; height:auto; max-height:min(42vh,560px); border:1px solid var(--line); border-radius:12px; background:#fff; object-fit:contain}
     .choices{display:flex; flex-direction:column; gap:10px}
-    .choice{display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:12px; padding:12px; background:#f8fbff; cursor:pointer; min-width:0}
+    .choice{display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:12px; padding:12px; background:#f8fbff; cursor:pointer}
     .choice:hover{outline:2px solid rgba(37,99,235,.15)}
     .choice.disabled{opacity:.7; cursor:default}
     .bullet{min-width:26px; height:26px; display:inline-grid; place-items:center; border-radius:999px; border:1px solid #cbd5e1; color:#1f2937; font-weight:700}
-    .ctext{text-align:left; flex:1; min-width:0; overflow-wrap:anywhere; word-break:break-word; line-break:strict}
+    .ctext{text-align:left; flex:1; white-space:pre-wrap; word-break:break-word}
     .result{font-weight:700}
     .result.ok{color:var(--ok)}
     .result.bad{color:var(--bad)}
     .explain details{border-top:1px dashed var(--line); padding-top:8px}
     .explain summary{cursor:pointer; list-style:none; font-weight:700; color:#1f4ed8}
     .explain summary::-webkit-details-marker{display:none}
-    .exbody{padding-bottom:calc(76px + env(safe-area-inset-bottom)); white-space:pre-wrap; color:var(--muted); margin-top:8px; line-height:1.7}
+    .exbody{padding-bottom:calc(76px + env(safe-area-inset-bottom)); white-space:pre-wrap; word-break:break-word; color:var(--muted); margin-top:8px; line-height:1.7}
+
     footer{position:fixed; left:0; right:0; bottom:0; z-index:50; background:rgba(255,255,255,.85); backdrop-filter:blur(6px); border-top:1px solid var(--line)}
     .bar{max-width:960px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:10px}
     .spacer{flex:1}
     .btn-primary{background:linear-gradient(180deg,#3b82f6,#2563eb); color:#fff; border-color:#2563eb}
     .btn-ghost{background:#fff}
     .btn-danger{border-color:#fecaca; background:#fff0f0; color:#b91c1c}
+
     #imgModal{position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; z-index:100}
     #imgModal img{max-width:96vw; max-height:92vh; background:#fff; border-radius:12px}
-    @media (max-width:430px){ .qtext{font-size:16px} }
+
+    @media (max-width:430px){
+      .qtext{font-size:16px}
+    }
   </style>
 </head>
 <body>
@@ -57,9 +75,16 @@
     <header>
       <div class="container">
         <div class="row">
-          <div class="kpi" id="kpiLeft"><span>年度</span><select id="yearFilter"></select></div>
+          <div class="kpi" id="kpiLeft">
+            <span>年度</span>
+            <select id="yearFilter"></select>
+          </div>
           <div class="title">RCCM 問題2</div>
-          <div class="kpi" id="kpiRight"><span id="counter">0 / 0</span><span>正解率 <b id="rate">0%</b></span><button id="resetBtn" class="btn-danger" title="正解済みをリセット">リセット</button></div>
+          <div class="kpi" id="kpiRight">
+            <span id="counter">0 / 0</span>
+            <span>正解率 <b id="rate">0%</b></span>
+            <button id="resetBtn" class="btn-danger" title="正解済みをリセット">リセット</button>
+          </div>
         </div>
       </div>
     </header>
@@ -93,24 +118,39 @@
 
   <div id="imgModal"><img alt=""></div>
 
+  <!-- 既存互換スロット（空でOK） -->
   <script type="application/json" id="problems-data">[]</script>
-  <script>window.PROBLEMS_CHUNKS = window.PROBLEMS_CHUNKS || []; var PROBLEMS_CHUNKS = window.PROBLEMS_CHUNKS;</script>
 
-  <!-- ▼どちらの命名でも拾えるよう両系列を読み込み（存在しないものは404で無視されます） -->
-  <script src="problems_chunk1_of4.js"></script>
-  <script src="problems_chunk2_of4.js"></script>
-  <script src="problems_chunk3_of4.js"></script>
-  <script src="problems_chunk4_of4.js"></script>
+  <!-- ▼▼ 動的チャンクローダー（存在するファイルだけ読み込む／失敗は可視化） ▼▼ -->
+  <script>
+    window.PROBLEMS_CHUNKS = window.PROBLEMS_CHUNKS || [];
+    (function(){
+      const CANDIDATES = [
+        'problems_chunk1_of4.js','problems_chunk2_of4.js',
+        'problems_chunk3_of4.js','problems_chunk4_of4.js',
+        'problems2_chunk1_of4.js','problems2_chunk2_of4.js',
+        'problems2_chunk3_of4.js','problems2_chunk4_of4.js'
+      ];
+      const status = [];
+      let pending = CANDIDATES.length;
+      function done(){ if(--pending===0) window.dispatchEvent(new Event('chunks:ready')); }
+      CANDIDATES.forEach(src=>{
+        const s=document.createElement('script');
+        s.src=src; s.async=false;
+        s.onload = ()=>{ status.push([src,'ok']); done(); };
+        s.onerror= ()=>{ status.push([src,'404']); done(); };
+        document.head.appendChild(s);
+      });
+      window.__chunk_status = status;
+    })();
+  </script>
+  <!-- ▲▲ 動的チャンクローダー ▲▲ -->
 
-  <script src="problems2_chunk1_of4.js"></script>
-  <script src="problems2_chunk2_of4.js"></script>
-  <script src="problems2_chunk3_of4.js"></script>
-  <script src="problems2_chunk4_of4.js"></script>
-  <!-- ▲ここまで -->
-
+  <!-- アプリ本体 -->
   <script>
   (function(){
     const $ = s => document.querySelector(s);
+
     const cardEl = $('#card'), loadingEl = $('#loading');
     const metaEl = $('#meta'), metaREl = $('#metaR'), qEl = $('#q');
     const imgWrap = $('#imgwrap'), imgEl = $('#qimg');
@@ -119,46 +159,87 @@
     const prevBtn = $('#prevBtn'), nextBtn = $('#nextBtn'), resetBtn = $('#resetBtn');
     const yearFilter = $('#yearFilter'), counterEl = $('#counter'), rateEl = $('#rate');
 
-    const STORAGE_CORRECT='rccm_q2_correct_ids_v1', STORAGE_ORDER='rccm_q2_order_v2', STORAGE_INDEX='rccm_q2_index_v2', STORAGE_YEAR='rccm_q2_year';
-    let correctSet=new Set(JSON.parse(localStorage.getItem(STORAGE_CORRECT)||'[]'));
-    let ALL=[];
+    // 問題2用キー
+    const STORAGE_CORRECT = 'rccm2_q_correct_ids_v1';
+    const STORAGE_ORDER   = 'rccm2_order_v1';
+    const STORAGE_INDEX   = 'rccm2_index_v1';
+
+    let correctSet = new Set(JSON.parse(localStorage.getItem(STORAGE_CORRECT)||'[]'));
+    let ALL = [];
 
     function loadProblems(){
-      let list=[];
+      let list = [];
+      // A: inline JSON
       try{
-        const txt=(document.querySelector('#problems-data')?.textContent||'').trim();
-        if(txt && txt!=='[]') list=JSON.parse(txt);
+        const slot = document.querySelector('#problems-data');
+        const txt = (slot?.textContent||'').trim();
+        if(txt && txt !== '[]') list = JSON.parse(txt);
       }catch(e){}
-      const chunksWin=Array.isArray(window.PROBLEMS_CHUNKS)?window.PROBLEMS_CHUNKS:[];
-      const chunksGbl=(typeof PROBLEMS_CHUNKS!=='undefined' && Array.isArray(PROBLEMS_CHUNKS))?PROBLEMS_CHUNKS:[];
-      for(const chunk of [...chunksWin,...chunksGbl]) if(Array.isArray(chunk)) list.push(...chunk);
-      list=list.map(n=>({id:String(n.id??`${n.year}-${n.number}`),year:Number(n.year??0),yearDisplay:String(n.yearDisplay??''),number:Number(n.number??0),question:String(n.question??''),image:String(n.image??''),choices:Array.isArray(n.choices)?n.choices.map(x=>String(x)):[],correct:Number.isInteger(n.correct)?n.correct:-1,explanation:String(n.explanation??'')})).filter(n=>n.choices.length>0);
+
+      // B: CHUNKS（window とグローバルの両方から回収）
+      const chunksWin = (Array.isArray(window.PROBLEMS_CHUNKS) ? window.PROBLEMS_CHUNKS : []);
+      const chunksGbl = (typeof PROBLEMS_CHUNKS !== 'undefined' && Array.isArray(PROBLEMS_CHUNKS)) ? PROBLEMS_CHUNKS : [];
+      for(const chunk of [...chunksWin, ...chunksGbl]){
+        if(Array.isArray(chunk)) list.push(...chunk);
+      }
+
+      // 正規化
+      list = list.map(n=>({
+        id: String(n.id ?? `${n.year}-${n.number}`),
+        year: Number(n.year ?? 0),
+        yearDisplay: String(n.yearDisplay ?? ''),
+        number: Number(n.number ?? 0),
+        question: String(n.question ?? ''),
+        image: String(n.image ?? ''),
+        choices: Array.isArray(n.choices) ? n.choices.map(x=>String(x)) : [],
+        correct: Number.isInteger(n.correct) ? n.correct : -1,
+        explanation: String(n.explanation ?? '')
+      })).filter(n=>n.choices.length>0);
       return list;
     }
 
     function buildYearOptions(){
-      const ys=[...new Set(ALL.map(x=>x.year))].sort((a,b)=>a-b);
-      const map=new Map(ALL.map(x=>[x.year,x.yearDisplay]));
-      yearFilter.innerHTML='';
-      const opAll=document.createElement('option'); opAll.value=''; opAll.textContent='全年度'; yearFilter.appendChild(opAll);
-      ys.forEach(y=>{const op=document.createElement('option'); op.value=String(y); op.textContent=map.get(y)||y; yearFilter.appendChild(op);});
-      yearFilter.value=localStorage.getItem(STORAGE_YEAR)||'';
-      yearFilter.addEventListener('change',()=>{localStorage.setItem(STORAGE_YEAR,yearFilter.value); makeOrder(true); showAt(0);});
+      const ys = Array.from(new Set(ALL.map(x=>x.year))).sort((a,b)=>a-b);
+      const map = new Map(ALL.map(x=>[x.year, x.yearDisplay]));
+      yearFilter.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = ''; optAll.textContent = '全年度';
+      yearFilter.appendChild(optAll);
+      ys.forEach(y=>{
+        const op = document.createElement('option');
+        op.value = String(y); op.textContent = map.get(y) || y;
+        yearFilter.appendChild(op);
+      });
+      yearFilter.value = localStorage.getItem('rccm2_year')||'';
+      yearFilter.addEventListener('change', ()=>{
+        localStorage.setItem('rccm2_year', yearFilter.value);
+        makeOrder(true); showAt(0);
+      });
     }
 
     function filteredPool(){
-      const y=yearFilter.value;
-      let pool=ALL.filter(q=>!correctSet.has(q.id));
-      if(y) pool=pool.filter(q=>String(q.year)===y);
+      const y = yearFilter.value;
+      let pool = ALL.filter(q=>!correctSet.has(q.id));
+      if(y) pool = pool.filter(q=>String(q.year)===y);
       return pool;
     }
 
-    function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
-    let ORDER=[], IDX=0;
+    function shuffle(a){
+      for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+      return a;
+    }
+
+    let ORDER = [];
+    let IDX = 0;
 
     function makeOrder(save){
-      ORDER=shuffle(filteredPool().map(q=>q.id)); IDX=0;
-      if(save){localStorage.setItem(STORAGE_ORDER,JSON.stringify(ORDER)); localStorage.setItem(STORAGE_INDEX,String(IDX));}
+      const pool = filteredPool().map(q=>q.id);
+      ORDER = shuffle(pool);
+      IDX = 0;
+      if(save){
+        localStorage.setItem(STORAGE_ORDER, JSON.stringify(ORDER));
+        localStorage.setItem(STORAGE_INDEX, String(IDX));
+      }
       updateKPI();
     }
 
@@ -166,59 +247,134 @@
       if(!src) return '';
       if(src.startsWith('data:image/page')){
         if(src.includes('.png;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/png;base64,');
-        if(src.includes('.jpeg;base64,')||src.includes('.jpg;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/jpeg;base64,');
+        if(src.includes('.jpeg;base64,') || src.includes('.jpg;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/jpeg;base64,');
       }
       return src;
     }
 
-    let current=null;
+    let current = null;
     function render(q){
       if(!q){
-        qEl.textContent='データが読み込まれていません。次のどちらかを確認してください：① 同じフォルダに problems_chunk1..4_of4.js または problems2_chunk1..4_of4.js がある ② それらの中で window.PROBLEMS_CHUNKS.push([...]) が実行されている';
-        imgWrap.style.display='none'; imgEl.removeAttribute('src'); choicesEl.innerHTML=''; resultEl.textContent=''; explainEl.innerHTML=''; metaEl.textContent=''; metaREl.textContent='';
+        qEl.textContent='出題可能な問題がありません。リセットしてください。';
+        imgWrap.style.display='none'; imgEl.removeAttribute('src');
+        choicesEl.innerHTML=''; resultEl.textContent=''; explainEl.innerHTML='';
+        metaEl.textContent=''; metaREl.textContent='';
         return;
       }
-      metaEl.textContent=`${q.yearDisplay} / No.${q.number}`; metaREl.textContent=`ID: ${q.id}`; qEl.textContent=q.question;
-      const src=normalizeDataUri((q.image||'').trim());
-      if(src){ imgEl.onerror=()=>{imgEl.removeAttribute('src'); imgWrap.style.display='none';}; imgEl.src=src; imgWrap.style.display='flex'; } else { imgEl.removeAttribute('src'); imgWrap.style.display='none'; }
-      imgEl.onclick=()=>{ if(!imgEl.src) return; imgModalImg.src=imgEl.src; imgModal.style.display='flex'; };
-      imgModal.onclick=()=>{ imgModal.style.display='none'; imgModalImg.src=''; };
+      metaEl.textContent = `${q.yearDisplay} / No.${q.number}`;
+      metaREl.textContent = `ID: ${q.id}`;
+      qEl.textContent = q.question;
+
+      const src = normalizeDataUri(q.image||'').trim();
+      if(src){
+        imgEl.onerror = ()=>{ imgEl.removeAttribute('src'); imgWrap.style.display='none'; };
+        imgEl.src = src; imgWrap.style.display='flex';
+      }else{
+        imgEl.removeAttribute('src'); imgWrap.style.display='none';
+      }
+
+      // 画像タップで拡大
+      imgEl.onclick = ()=>{ if(!imgEl.src) return; imgModalImg.src = imgEl.src; imgModal.style.display='flex'; };
+      imgModal.onclick = ()=>{ imgModal.style.display='none'; imgModalImg.src=''; };
+
       choicesEl.innerHTML=''; resultEl.textContent=''; resultEl.className='result'; explainEl.innerHTML='';
-      q.choices.forEach((tx,i)=>{ const div=document.createElement('div'); div.className='choice'; div.dataset.index=i; const b=document.createElement('div'); b.className='bullet'; b.textContent=['a','b','c','d','e','f'][i]||String(i+1); const t=document.createElement('div'); t.className='ctext'; t.textContent=tx; div.appendChild(b); div.appendChild(t); div.addEventListener('click',()=>onChoose(i)); choicesEl.appendChild(div); });
+
+      q.choices.forEach((tx,i)=>{
+        const div = document.createElement('div'); div.className='choice'; div.dataset.index = i;
+        const b = document.createElement('div'); b.className='bullet'; b.textContent = ['a','b','c','d','e','f'][i]||String(i+1);
+        const t = document.createElement('div'); t.className='ctext'; t.textContent = tx;
+        div.appendChild(b); div.appendChild(t);
+        div.addEventListener('click', ()=>onChoose(i));
+        choicesEl.appendChild(div);
+      });
+
       updateKPI();
     }
 
-    function lockChoices(){ choicesEl.querySelectorAll('.choice').forEach(el=>{el.classList.add('disabled'); el.style.pointerEvents='none';}); }
+    function lockChoices(){
+      choicesEl.querySelectorAll('.choice').forEach(el=>{ el.classList.add('disabled'); el.style.pointerEvents='none'; });
+    }
+
     function onChoose(i){
       if(!current) return;
-      const ok=(i===current.correct); lockChoices();
+      const ok = (i===current.correct);
+      lockChoices();
       if(ok){
         resultEl.textContent='正解！'; resultEl.className='result ok';
-        correctSet.add(current.id); localStorage.setItem(STORAGE_CORRECT,JSON.stringify([...correctSet]));
-        const pos=ORDER.indexOf(current.id); if(pos>=0){ ORDER.splice(pos,1); if(IDX>=ORDER.length) IDX=Math.max(ORDER.length-1,0); }
-        localStorage.setItem(STORAGE_ORDER,JSON.stringify(ORDER));
+        correctSet.add(current.id);
+        localStorage.setItem(STORAGE_CORRECT, JSON.stringify([...correctSet]));
+        const pos = ORDER.indexOf(current.id);
+        if(pos>=0){ ORDER.splice(pos,1); if(IDX>=ORDER.length) IDX=Math.max(ORDER.length-1,0); }
+        localStorage.setItem(STORAGE_ORDER, JSON.stringify(ORDER));
       }else{
-        const letter=['a','b','c','d','e','f'][current.correct]||String(current.correct+1);
-        resultEl.textContent=`不正解。正解は ${letter}`; resultEl.className='result bad';
+        const letter = ['a','b','c','d','e','f'][current.correct]||String(current.correct+1);
+        resultEl.textContent = `不正解。正解は ${letter}`; resultEl.className='result bad';
       }
-      if(current.explanation){ explainEl.innerHTML='<details open><summary>解説</summary><div class="exbody"></div></details>'; explainEl.querySelector('.exbody').textContent=current.explanation; }
+      if(current.explanation){
+        explainEl.innerHTML = '<details open><summary>解説</summary><div class="exbody"></div></details>';
+        explainEl.querySelector('.exbody').textContent = current.explanation;
+      }
       updateKPI();
     }
 
-    function showAt(i){ if(!ORDER.length){ render(null); updateKPI(); return; } IDX=Math.min(Math.max(i,0),ORDER.length-1); const id=ORDER[IDX]; current=ALL.find(x=>x.id===id)||null; render(current); localStorage.setItem(STORAGE_INDEX,String(IDX)); }
+    function showAt(i){
+      if(!ORDER.length){ render(null); updateKPI(); return; }
+      IDX = Math.min(Math.max(i,0), ORDER.length-1);
+      const id = ORDER[IDX];
+      current = ALL.find(x=>x.id===id) || null;
+      render(current);
+      localStorage.setItem(STORAGE_INDEX, String(IDX));
+    }
+
     function prev(){ if(ORDER.length) showAt(IDX-1); }
     function next(){ if(ORDER.length) showAt(IDX+1); }
-    function resetProgress(){ if(confirm('正解済みの記録をリセットしますか？')){ correctSet.clear(); localStorage.setItem(STORAGE_CORRECT,'[]'); makeOrder(true); showAt(0); } }
-    function updateKPI(){ const totalAll=ALL.length, solved=correctSet.size, rate=totalAll?Math.round(solved/totalAll*100):0; rateEl.textContent=`${rate}%`; const poolN=ORDER.length; counterEl.textContent=`${Math.min(IDX+1,Math.max(poolN,1))} / ${Math.max(poolN,1)}`; prevBtn.disabled=(IDX<=0); nextBtn.disabled=(IDX>=ORDER.length-1); }
 
-    prevBtn.addEventListener('click',prev); nextBtn.addEventListener('click',next); resetBtn.addEventListener('click',resetProgress);
+    function resetProgress(){
+      if(confirm('正解済みの記録をリセットしますか？')){
+        correctSet.clear();
+        localStorage.setItem(STORAGE_CORRECT,'[]');
+        makeOrder(true); showAt(0);
+      }
+    }
+
+    function updateKPI(){
+      const totalAll = ALL.length;
+      const solved = correctSet.size;
+      const rate = totalAll? Math.round(solved/totalAll*100):0;
+      rateEl.textContent = `${rate}%`;
+      const poolN = ORDER.length;
+      counterEl.textContent = `${Math.min(IDX+1, Math.max(poolN,1))} / ${Math.max(poolN,1)}`;
+      prevBtn.disabled = (IDX<=0);
+      nextBtn.disabled = (IDX>=ORDER.length-1);
+    }
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+    resetBtn.addEventListener('click', resetProgress);
 
     function init(){
-      ALL=loadProblems();
-      if(!ALL||!ALL.length){ loadingEl.textContent='データが未設定です。問題データの JS（problems_chunk*.js / problems2_chunk*.js）を同じフォルダに配置してください。'; return; }
-      buildYearOptions(); makeOrder(true); try{loadingEl.remove();}catch(e){loadingEl.hidden=true;} cardEl.hidden=false; showAt(0);
+      ALL = loadProblems();
+      if(!ALL || !ALL.length){
+        const st = (window.__chunk_status||[])
+          .map(([n,r])=>`${r==='ok'?'✅':'❌'} ${n}`)
+          .join('\n') || '（まだ判定できません）';
+        loadingEl.textContent =
+          'データが未設定です。次のファイルの配置/名前を確認してください。\n' +
+          '- problems_chunk1..4_of4.js または problems2_chunk1..4_of4.js\n\n' +
+          '読み込み結果:\n' + st;
+        return;
+      }
+      buildYearOptions();
+      makeOrder(true);
+      try{loadingEl.remove();}catch(e){loadingEl.hidden=true;}
+      cardEl.hidden=false;
+      showAt(0);
     }
-    window.addEventListener('DOMContentLoaded',init);
+
+    // チャンク読込が終わってから初期化
+    window.addEventListener('chunks:ready', init);
+    // 念のため DOMContentLoaded 後に、もし既に読めていれば即実行
+    window.addEventListener('DOMContentLoaded', ()=>{ if((window.PROBLEMS_CHUNKS||[]).length) init(); });
   })();
   </script>
 </body>
