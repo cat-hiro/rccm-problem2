@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>RCCM 問題2</title>
+  <style>
+    [hidden]{display:none!important}
+    :root{
+      --bg:#f6f9ff; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+      --line:#e2e8f0; --brand:#2563eb; --ok:#16a34a; --bad:#ef4444;
+      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{padding-bottom:calc(76px + env(safe-area-inset-bottom)); height:100%}
+    body{padding-bottom:calc(76px + env(safe-area-inset-bottom)); 
+      margin:0; background:linear-gradient(180deg,#f6f9ff,#eef4ff 40%,#f6f9ff);
+      color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,"Noto Sans JP",sans-serif;
+      overflow:auto;
+    }
+    .wrap{min-height:100vh; display:flex; flex-direction:column}
+    header{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.7); backdrop-filter:blur(6px); border-bottom:1px solid var(--line)}
+    .container{max-width:960px; margin:0 auto; padding:12px 16px}
+    .row{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+    .title{flex:1; text-align:center; font-weight:800; letter-spacing:.02em; font-size:clamp(20px,4.6vw,28px); color:#0b3ea8}
+    .kpi{display:flex; gap:10px; color:var(--muted); font-size:.9rem}
+    .kpi b{color:var(--ink)}
+    select,button{appearance:none; border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink); padding:10px 12px; font-weight:600}
+    select{padding-right:28px}
+
+    main{flex:1;}
+    .inner{max-width:960px; margin:14px auto; padding:0 16px;}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; display:flex; flex-direction:column; gap:10px}
+    .meta{display:flex; align-items:center; justify-content:space-between; color:var(--muted)}
+    .qwrap{display:flex; gap:12px}
+    .qleft{flex:1; min-width:0; display:flex; flex-direction:column; gap:12px}
+    .qtext{padding:10px; border:1px solid var(--line); border-radius:12px; background:#fafcff; line-height:1.7}
+    .choices{display:flex; flex-direction:column; gap:10px}
+    .choice{display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:12px; padding:12px; background:#f8fbff; cursor:pointer}
+    .choice:hover{outline:2px solid rgba(37,99,235,.15)}
+    .choice.disabled{opacity:.7; cursor:default}
+    .bullet{min-width:26px; height:26px; display:inline-grid; place-items:center; border-radius:999px; border:1px solid #cbd5e1; color:#1f2937; font-weight:700}
+    .ctext{text-align:left; flex:1}
+    .result{font-weight:700}
+    .result.ok{color:var(--ok)}
+    .result.bad{color:var(--bad)}
+    .explain details{border-top:1px dashed var(--line); padding-top:8px}
+    .explain summary{cursor:pointer; list-style:none; font-weight:700; color:#1f4ed8}
+    .explain summary::-webkit-details-marker{display:none}
+    .exbody{padding-bottom:calc(76px + env(safe-area-inset-bottom)); white-space:pre-wrap; color:var(--muted); margin-top:8px; line-height:1.7}
+
+    footer{position:fixed; left:0; right:0; bottom:0; z-index:50; background:rgba(255,255,255,.85); backdrop-filter:blur(6px); border-top:1px solid var(--line)}
+    .bar{max-width:960px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:10px}
+    .spacer{flex:1}
+    .btn-primary{background:linear-gradient(180deg,#3b82f6,#2563eb); color:#fff; border-color:#2563eb}
+    .btn-ghost{background:#fff}
+    .btn-danger{border-color:#fecaca; background:#fff0f0; color:#b91c1c}
+
+    @media (max-width:430px){
+      .qtext{font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="container">
+        <div class="row">
+          <div class="kpi" id="kpiLeft">
+            <span>年度</span>
+            <select id="yearFilter"></select>
+          </div>
+          <div class="title">RCCM 問題2</div>
+          <div class="kpi" id="kpiRight">
+            <span id="counter">0 / 0</span>
+            <span>正解率 <b id="rate">0%</b></span>
+            <button id="resetBtn" class="btn-danger" title="正解済みをリセット">リセット</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="inner">
+        <div id="card" class="card" hidden>
+          <div class="meta"><div id="meta"></div><div id="metaR"></div></div>
+          <div class="qwrap">
+            <div class="qleft">
+              <div id="q" class="qtext"></div>
+              <div id="choices" class="choices"></div>
+              <div id="result" class="result"></div>
+              <div id="explain" class="explain"></div>
+            </div>
+          </div>
+        </div>
+        <div id="loading" class="card">読み込み中…</div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="bar">
+        <button id="prevBtn" class="btn-ghost">前の問題</button>
+        <div class="spacer"></div>
+        <button id="nextBtn" class="btn-primary">次の問題</button>
+      </div>
+    </footer>
+  </div>
+
+  <script type="application/json" id="problems-data">[]</script>
+  <script>window.PROBLEMS_CHUNKS = window.PROBLEMS_CHUNKS || []; var PROBLEMS_CHUNKS = window.PROBLEMS_CHUNKS;</script>
+
+  <script src="problems2_chunk1_of4.js"></script>
+  <script src="problems2_chunk2_of4.js"></script>
+  <script src="problems2_chunk3_of4.js"></script>
+  <script src="problems2_chunk4_of4.js"></script>
+
+  <script>
+  (function(){
+    const $ = s => document.querySelector(s);
+
+    const cardEl = $('#card'), loadingEl = $('#loading');
+    const metaEl = $('#meta'), metaREl = $('#metaR'), qEl = $('#q');
+    const choicesEl = $('#choices'), resultEl = $('#result'), explainEl = $('#explain');
+    const prevBtn = $('#prevBtn'), nextBtn = $('#nextBtn'), resetBtn = $('#resetBtn');
+    const yearFilter = $('#yearFilter'), counterEl = $('#counter'), rateEl = $('#rate');
+
+    const STORAGE_CORRECT = 'rccm_q2_correct_ids_v1';
+    const STORAGE_ORDER   = 'rccm_q2_order_v1';
+    const STORAGE_INDEX   = 'rccm_q2_index_v1';
+
+    let correctSet = new Set(JSON.parse(localStorage.getItem(STORAGE_CORRECT)||'[]'));
+    let ALL = [];
+
+    function loadProblems(){
+      let list = [];
+      try{
+        const slot = document.querySelector('#problems-data');
+        const txt = (slot?.textContent||'').trim();
+        if(txt && txt !== '[]') list = JSON.parse(txt);
+      }catch(e){}
+
+      const chunksWin = (Array.isArray(window.PROBLEMS_CHUNKS) ? window.PROBLEMS_CHUNKS : []);
+      const chunksGbl = (typeof PROBLEMS_CHUNKS !== 'undefined' && Array.isArray(PROBLEMS_CHUNKS)) ? PROBLEMS_CHUNKS : [];
+      for(const chunk of [...chunksWin, ...chunksGbl]){
+        if(Array.isArray(chunk)) list.push(...chunk);
+      }
+      list = list.map(n=>({
+        id: String(n.id ?? `${n.year}-${n.number}`),
+        year: Number(n.year ?? 0),
+        yearDisplay: String(n.yearDisplay ?? n.year_display ?? ''),
+        number: Number(n.number ?? 0),
+        question: String(n.question ?? n.stem ?? ''),
+        image: '',
+        choices: Array.isArray(n.choices) ? n.choices.map(x=>String(x)) : [],
+        correct: Number.isInteger(n.correct) ? n.correct : (
+          typeof n.correct_letter === 'string' ? ['a','b','c','d','e','f'].indexOf(n.correct_letter.toLowerCase()) : -1
+        ),
+        explanation: String(n.explanation ?? '')
+      })).filter(n=>n.choices.length>0);
+      return list;
+    }
+
+    function buildYearOptions(){
+      const ys = Array.from(new Set(ALL.map(x=>x.year))).sort((a,b)=>a-b);
+      const map = new Map(ALL.map(x=>[x.year, x.yearDisplay]));
+      yearFilter.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = ''; optAll.textContent = '全年度';
+      yearFilter.appendChild(optAll);
+      ys.forEach(y=>{
+        const op = document.createElement('option');
+        op.value = String(y); op.textContent = map.get(y) || y;
+        yearFilter.appendChild(op);
+      });
+      yearFilter.value = localStorage.getItem('rccm_q2_year')||'';
+      yearFilter.addEventListener('change', ()=>{
+        localStorage.setItem('rccm_q2_year', yearFilter.value);
+        makeOrder(true); showAt(0);
+      });
+    }
+
+    function filteredPool(){
+      const y = yearFilter.value;
+      let pool = ALL.filter(q=>!correctSet.has(q.id));
+      if(y) pool = pool.filter(q=>String(q.year)===y);
+      return pool;
+    }
+
+    function shuffle(a){
+      for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+      return a;
+    }
+
+    let ORDER = [];
+    let IDX = 0;
+
+    function makeOrder(save){
+      const pool = filteredPool().map(q=>q.id);
+      ORDER = shuffle(pool);
+      IDX = 0;
+      if(save){
+        localStorage.setItem(STORAGE_ORDER, JSON.stringify(ORDER));
+        localStorage.setItem(STORAGE_INDEX, String(IDX));
+      }
+      updateKPI();
+    }
+
+    let current = null;
+    function render(q){
+      if(!q){
+        qEl.textContent='出題可能な問題がありません。リセットしてください。';
+        choicesEl.innerHTML=''; resultEl.textContent=''; explainEl.innerHTML='';
+        metaEl.textContent=''; metaREl.textContent='';
+        return;
+      }
+      metaEl.textContent = `${q.yearDisplay} / No.${q.number}`;
+      metaREl.textContent = `ID: ${q.id}`;
+      qEl.textContent = q.question;
+
+      choicesEl.innerHTML='';
+      resultEl.textContent=''; resultEl.className='result';
+      explainEl.innerHTML='';
+
+      q.choices.forEach((tx,i)=>{
+        const div = document.createElement('div'); div.className='choice'; div.dataset.index = i;
+        const b = document.createElement('div'); b.className='bullet'; b.textContent = ['a','b','c','d','e','f'][i]||String(i+1);
+        const t = document.createElement('div'); t.className='ctext'; t.textContent = tx;
+        div.appendChild(b); div.appendChild(t);
+        div.addEventListener('click', ()=>onChoose(i));
+        choicesEl.appendChild(div);
+      });
+
+      updateKPI();
+    }
+
+    function lockChoices(){
+      choicesEl.querySelectorAll('.choice').forEach(el=>{ el.classList.add('disabled'); el.style.pointerEvents='none'; });
+    }
+
+    function onChoose(i){
+      if(!current) return;
+      const ok = (i===current.correct);
+      lockChoices();
+      if(ok){
+        resultEl.textContent='正解！'; resultEl.className='result ok';
+        correctSet.add(current.id);
+        localStorage.setItem(STORAGE_CORRECT, JSON.stringify([...correctSet]));
+        const pos = ORDER.indexOf(current.id);
+        if(pos>=0){ ORDER.splice(pos,1); if(IDX>=ORDER.length) IDX=Math.max(ORDER.length-1,0); }
+        localStorage.setItem(STORAGE_ORDER, JSON.stringify(ORDER));
+      }else{
+        const letter = ['a','b','c','d','e','f'][current.correct]||String(current.correct+1);
+        resultEl.textContent = `不正解。正解は ${letter}`; resultEl.className='result bad';
+      }
+      if(current.explanation){
+        const details = document.createElement('details'); details.open = true;
+        const sum = document.createElement('summary'); sum.textContent = '解説';
+        const body = document.createElement('div'); body.className = 'exbody'; body.textContent = current.explanation;
+        details.appendChild(sum); details.appendChild(body);
+        explainEl.innerHTML = ''; explainEl.appendChild(details);
+      }
+      updateKPI();
+    }
+
+    function showAt(i){
+      if(!ORDER.length){ render(null); updateKPI(); return; }
+      IDX = Math.min(Math.max(i,0), ORDER.length-1);
+      const id = ORDER[IDX];
+      current = ALL.find(x=>x.id===id) || null;
+      render(current);
+      localStorage.setItem(STORAGE_INDEX, String(IDX));
+    }
+
+    function prev(){ if(ORDER.length) showAt(IDX-1); }
+    function next(){ if(ORDER.length) showAt(IDX+1); }
+
+    function resetProgress(){
+      if(confirm('正解済みの記録をリセットしますか？')){
+        correctSet.clear();
+        localStorage.setItem(STORAGE_CORRECT,'[]');
+        makeOrder(true); showAt(0);
+      }
+    }
+
+    function updateKPI(){
+      const totalAll = ALL.length;
+      const solved = correctSet.size;
+      const rate = totalAll? Math.round(solved/totalAll*100):0;
+      rateEl.textContent = `${rate}%`;
+      const poolN = ORDER.length;
+      counterEl.textContent = `${Math.min(IDX+1, Math.max(poolN,1))} / ${Math.max(poolN,1)}`;
+      prevBtn.disabled = (IDX<=0);
+      nextBtn.disabled = (IDX>=ORDER.length-1);
+    }
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+    resetBtn.addEventListener('click', resetProgress);
+
+    function init(){
+      ALL = loadProblems();
+      if(!ALL || !ALL.length){
+        loadingEl.textContent='データが未設定です。problems2_chunk*.js を読み込んでください。';
+        return;
+      }
+      buildYearOptions();
+      makeOrder(true);
+      if(loadingEl){ try{loadingEl.remove();}catch(e){loadingEl.hidden=true;} } cardEl.hidden=false;
+      showAt(0);
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  })();
+  </script>
+</body>
+</html>
