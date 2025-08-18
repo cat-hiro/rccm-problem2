@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>RCCM 問題2</title>
+  <style>
+    :root{
+      --bg:#f5f6f8; --card:#ffffff; --text:#111827; --muted:#6b7280;
+      --accent:#0ea5e9; --pill:#eef2f7; --border:#e5e7eb;
+      --shadow:0 10px 24px rgba(17,24,39,.07); --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans JP","Hiragino Sans","Yu Gothic",Meiryo,sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:12px 14px 88px}
+    header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border)}
+    .h-inner{max-width:980px;margin:0 auto;padding:12px 14px}
+    .title{font-weight:800;font-size:22px;text-align:center}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;justify-content:center}
+    .select,.btn{display:inline-flex;align-items:center;gap:8px;background:var(--pill);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:8px 12px;font-size:14px;box-shadow:var(--shadow)}
+    select{appearance:none;background:transparent;border:none;color:var(--text);font-size:14px;outline:none}
+    .stats{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+    .pill{background:var(--pill);padding:6px 10px;border-radius:999px;border:1px solid var(--border)}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-top:14px}
+    .q-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .q-num{background:var(--accent);color:#fff;border-radius:10px;padding:6px 10px;font-weight:700}
+    .q-text{line-height:1.65;white-space:pre-wrap}
+    .choice{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--border);padding:12px;border-radius:12px;margin:10px 0;font-size:15px;line-height:1.6;box-shadow:0 2px 8px rgba(17,24,39,.04)}
+    .choice .label{font-weight:700;margin-right:6px;color:#2563eb}
+    .correct{outline:2px solid rgba(34,197,94,.7);background:rgba(34,197,94,.08)}
+    .wrong{outline:2px solid rgba(239,68,68,.7);background:rgba(239,68,68,.08)}
+    .result{border:1px dashed var(--border);padding:10px;border-radius:12px;margin-top:6px;display:none;background:#f9fafb}
+    .ok{display:block;background:rgba(34,197,94,.1)} .ng{display:block;background:rgba(239,68,68,.1)}
+    .explain{background:#f3f7fd;border:1px solid #dbeafe;border-left:4px solid var(--accent);padding:12px;border-radius:12px;margin-top:10px;white-space:pre-wrap;color:#1f2937}
+    .badge{display:inline-flex;gap:6px;align-items:center;background:#e6f6ff;border:1px solid #bae6fd;color:#0c4a6e;font-size:12px;border-radius:999px;padding:4px 8px;margin-right:6px}
+    .nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#ffffffcc;backdrop-filter:blur(6px);border-top:1px solid var(--border)}
+    .nav-inner{max-width:980px;margin:0 auto;padding:10px 14px;display:flex;gap:10px}
+    .nav .btn{flex:1;justify-content:center}
+    .primary{background:linear-gradient(180deg,#38bdf8,#0ea5e9);color:#fff;border-color:#7dd3fc}
+    .secondary{background:var(--pill)}
+    .hidden{display:none} .muted{color:var(--muted)} .error{color:#b91c1c}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="h-inner">
+      <div class="title">RCCM 問題2</div>
+      <div class="toolbar">
+        <div class="select"><span class="muted">年度：</span><select id="yearSelect"></select></div>
+        <button class="btn" id="resetBtn">リセット</button>
+        <div class="stats"><span id="counter">問題 0 / 0</span><span>|</span><span id="accuracy">正解率 0%</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="pill" id="yearTag">年度</div>
+    <div class="card">
+      <div class="q-head">
+        <div class="q-num" id="qNumber">問題</div>
+        <div class="badge hidden" id="badgeErrata">出題注意</div>
+        <div class="badge hidden" id="badgeMulti">複数正解</div>
+        <div class="badge hidden" id="badgeAnswered">解答済</div>
+      </div>
+      <div class="q-text" id="qText">問題文を読み込み中…</div>
+    </div>
+
+    <button class="choice" id="choiceA"><span class="label">a.</span><span class="text"></span></button>
+    <button class="choice" id="choiceB"><span class="label">b.</span><span class="text"></span></button>
+    <button class="choice" id="choiceC"><span class="label">c.</span><span class="text"></span></button>
+    <button class="choice" id="choiceD"><span class="label">d.</span><span class="text"></span></button>
+
+    <div class="result" id="resultBox"><strong id="resultTitle">結果</strong><div class="muted" id="resultHint"></div></div>
+    <div class="explain hidden" id="explainBox"></div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <button class="btn secondary" id="prevBtn">← 前の問題</button>
+      <button class="btn primary" id="nextBtn">次の問題 →</button>
+    </div>
+  </nav>
+
+  <!-- コアロジック（ES5互換, ランダム出題＋正解済みスキップ, 自動表示オフ） -->
+  <script>
+    (function(){
+      var storeKey="rccm_training_v1"; var data=[], filtered=[], cursor=0, progress={};
+      function saveProgress(){ try{localStorage.setItem(storeKey, JSON.stringify(progress));}catch(e){} }
+      function loadProgress(){ try{progress=JSON.parse(localStorage.getItem(storeKey)||"{}");}catch(e){progress={};} }
+      function setText(el,t){ if(el) el.textContent=t; }
+      function computeStats(){
+        var ids=[], i; for(i=0;i<filtered.length;i++){ ids.push(data[filtered[i]].id); }
+        var answered=0, ok=0;
+        for(i=0;i<ids.length;i++){ var p=progress[ids[i]]; if(p && p.answered){ answered++; if(p.correct) ok++; } }
+        var acc = answered? Math.round(100*ok/answered):0;
+        setText(document.getElementById('counter'), '問題 '+(filtered.length? Math.min(cursor+1,filtered.length):0)+' / '+filtered.length);
+        setText(document.getElementById('accuracy'), '正解率 '+acc+'%');
+      }
+      function updateYearTag(item){ setText(document.getElementById('yearTag'), item && item.era_year ? item.era_year : ''); }
+      function setBadge(elId, show){ var el=document.getElementById(elId); if(!el) return; if(show){ el.classList.remove('hidden'); } else { el.classList.add('hidden'); } }
+      function shuffle(arr){
+        for(var i=arr.length-1;i>0;i--){
+          var j = Math.floor(Math.random()*(i+1));
+          var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+        }
+      }
+      function renderQuestion(){
+        if(!filtered.length){
+          setText(document.getElementById('qNumber'), '問題 -');
+          setText(document.getElementById('qText'), '出題可能な問題がありません。（全問正解済みの可能性）\n右上の「リセット」で再挑戦できます。');
+          ['A','B','C','D'].forEach(function(ch){ var el=document.getElementById('choice'+ch); if(el){ el.disabled=true; el.classList.remove('correct'); el.classList.remove('wrong'); var txt=document.querySelector('#choice'+ch+' .text'); if(txt) txt.textContent=''; }});
+          var rb=document.getElementById('resultBox'); if(rb){ rb.style.display='none'; rb.classList.remove('ok'); rb.classList.remove('ng'); }
+          setBadge('badgeErrata', false); setBadge('badgeMulti', false); setBadge('badgeAnswered', false);
+          computeStats(); return;
+        }
+        var item = data[filtered[cursor]];
+        if(!item){ setText(document.getElementById('qText'),'問題データがありません'); return; }
+        var multi = (item.correct||'').split('|').filter(function(s){return !!s;});
+        setBadge('badgeMulti', multi.length>1);
+        var nf = (item.notes_flag||'').toUpperCase();
+        var hasErrata = nf.indexOf('ERRATA')>=0 || nf.indexOf('AMBIGUOUS')>=0;
+        setBadge('badgeErrata', hasErrata);
+
+        setText(document.getElementById('qNumber'), '問題 '+item.q_no);
+        setText(document.getElementById('qText'), item.question || '');
+        var elA=document.querySelector('#choiceA .text'); if(elA) elA.textContent=item.option_a||'';
+        var elB=document.querySelector('#choiceB .text'); if(elB) elB.textContent=item.option_b||'';
+        var elC=document.querySelector('#choiceC .text'); if(elC) elC.textContent=item.option_c||'';
+        var elD=document.querySelector('#choiceD .text'); if(elD) elD.textContent=item.option_d||'';
+        var ex=document.getElementById('explainBox'); if(ex){ ex.classList.add('hidden'); ex.textContent=item.explanation||''; }
+        var rb=document.getElementById('resultBox'); if(rb){ rb.classList.remove('ok'); rb.classList.remove('ng'); rb.style.display='none'; }
+        ['A','B','C','D'].forEach(function(ch){ var el=document.getElementById('choice'+ch); if(el){ el.classList.remove('correct'); el.classList.remove('wrong'); el.disabled=false; }});
+        updateYearTag(item); computeStats();
+
+        var prev = progress[item.id];
+        setBadge('badgeAnswered', !!(prev && prev.answered));
+      }
+      function revealAnswer(chosen){
+        var item = data[filtered[cursor]];
+        var correct = (item.correct||'').toLowerCase().split('|').filter(function(s){return !!s;});
+        ['a','b','c','d'].forEach(function(ch){
+          var el = document.getElementById('choice'+ch.toUpperCase());
+          if(!el) return;
+          if(correct.indexOf(ch)>=0){ el.classList.add('correct'); } else { el.classList.remove('correct'); }
+          if(chosen && chosen===ch && correct.indexOf(ch)<0){ el.classList.add('wrong'); } else { el.classList.remove('wrong'); }
+          el.disabled=true;
+        });
+        var ok = correct.indexOf(chosen)>=0;
+        var box=document.getElementById('resultBox'); if(box){ box.style.display='block'; if(ok){ box.classList.add('ok'); box.classList.remove('ng'); } else { box.classList.add('ng'); box.classList.remove('ok'); } }
+        setText(document.getElementById('resultTitle'), ok ? '✅ 正解！' : '❌ 不正解');
+        setText(document.getElementById('resultHint'), ok ? '' : ('正解は '+correct.join(' / ')+' です。'));
+        var exp=document.getElementById('explainBox'); if(exp && (item.explanation||'').replace(/\s+/g,'')!==''){ exp.classList.remove('hidden'); }
+        progress[item.id] = {answered:true, correct:ok, choice:chosen}; saveProgress(); computeStats();
+
+        if(ok){
+          filtered.splice(cursor, 1);
+          if(cursor >= filtered.length){ cursor = Math.max(0, filtered.length-1); }
+          renderQuestion();
+        }else{
+          setBadge('badgeAnswered', true);
+        }
+      }
+      function onChoice(letter){ return function(){ revealAnswer(letter); }; }
+      function applyFilter(){
+        var selVal = document.getElementById('yearSelect').value; filtered=[];
+        for(var i=0;i<data.length;i++){
+          if(selVal==='ALL' || data[i].era_year===selVal){
+            var id = data[i].id;
+            var p = progress[id];
+            if(!(p && p.correct===true)){ filtered.push(i); }
+          }
+        }
+        shuffle(filtered);
+        cursor=0; renderQuestion();
+      }
+      function populateYears(){
+        var uniq = {}; data.forEach(function(d){ if(d && d.era_year) uniq[d.era_year] = d.year_western || 0; });
+        var years = Object.keys(uniq).sort(function(a,b){ return (uniq[a]||0)-(uniq[b]||0); });
+        var sel = document.getElementById('yearSelect'); sel.innerHTML='';
+        var o0=document.createElement('option'); o0.value='ALL'; o0.textContent='全年度'; sel.appendChild(o0);
+        years.forEach(function(era){ var o=document.createElement('option'); o.value=era; o.textContent=era; sel.appendChild(o); });
+        sel.value = (localStorage.getItem(storeKey+'_filter') || 'ALL');
+        sel.addEventListener('change', function(){ localStorage.setItem(storeKey+'_filter', sel.value); applyFilter(); });
+      }
+      function wire(){
+        document.getElementById('choiceA').addEventListener('click', onChoice('a'));
+        document.getElementById('choiceB').addEventListener('click', onChoice('b'));
+        document.getElementById('choiceC').addEventListener('click', onChoice('c'));
+        document.getElementById('choiceD').addEventListener('click', onChoice('d'));
+        document.getElementById('prevBtn').addEventListener('click', function(){ if(cursor>0){cursor--; renderQuestion();} });
+        document.getElementById('nextBtn').addEventListener('click', function(){ if(cursor<filtered.length-1){cursor++; renderQuestion();} });
+        document.getElementById('resetBtn').addEventListener('click', function(){
+          if(confirm('進捗（回答履歴）をリセットしますか？')){
+            progress={}; saveProgress(); applyFilter();
+          }
+        });
+      }
+      window.__APP__ = {
+        setData: function(p){ data = (p && p.items) ? p.items : []; populateYears(); wire(); applyFilter(); },
+        setError: function(msg){
+          var sub=document.getElementById('subtitle');
+          if(sub){ sub.innerHTML='読み込み失敗<br><small class="error">'+msg+'</small>'; }
+          var qt=document.getElementById('qText'); if(qt){ qt.textContent='読み込みエラー：'+msg; }
+        }
+      };
+      loadProgress();
+    })();
+  </script>
+
+  <!-- データ（rccm_data.js） -->
+  <script src="rccm_data.js"></script>
+
+  <!-- データ投入 -->
+  <script>
+    if(window.RCCM_DATA && window.__APP__){ window.__APP__.setData(window.RCCM_DATA); }
+    else if(window.__APP__){ window.__APP__.setError('rccm_data.js が読み込めません'); }
+    else { var qt=document.getElementById('qText'); if(qt){ qt.textContent='初期化エラー（__APP__ 未定義）'; } }
+  </script>
+</body>
+</html>
