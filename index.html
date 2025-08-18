@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>RCCM 問題4-2 | JSON版（堅牢）</title>
+  <style>
+    :root{--bg:#0b1020;--card:#0f172a;--text:#e5e7eb;--muted:#9ca3af;--accent:#0ea5e9;--pill:#1f2937;--shadow:0 10px 25px rgba(0,0,0,.25);--radius:16px}
+    *{box-sizing:border-box} html,body{margin:0;height:100%;background:linear-gradient(180deg,#0b1020,#111827);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans JP","Hiragino Sans","Yu Gothic",Meiryo,sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:12px 14px 80px}
+    header{position:sticky;top:0;z-index:50;backdrop-filter:saturate(1.2) blur(8px);background:rgba(11,16,32,.7);border-bottom:1px solid rgba(255,255,255,.06)}
+    .h-inner{max-width:980px;margin:0 auto;padding:12px 14px}
+    .title{font-weight:800;font-size:22px} .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .select,.btn{display:inline-flex;align-items:center;gap:8px;background:var(--pill);border:1px solid rgba(255,255,255,.08);color:var(--text);border-radius:12px;padding:8px 12px;font-size:14px;box-shadow:var(--shadow)}
+    select{appearance:none;background:transparent;border:none;color:var(--text);font-size:14px;outline:none}
+    .stats{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+    .pill{background:var(--pill);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08)}
+    .card{background:linear-gradient(180deg,#0f172a,#111827);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-top:14px}
+    .q-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+    .q-num{background:var(--accent);color:#00243a;border-radius:10px;padding:6px 10px;font-weight:700}
+    .q-text{line-height:1.65;white-space:pre-wrap}
+    .choice{display:block;width:100%;text-align:left;background:#0f172a;border:1px solid rgba(255,255,255,.08);padding:12px;border-radius:12px;margin:10px 0;font-size:15px;line-height:1.6}
+    .choice .label{font-weight:700;margin-right:6px;opacity:.9}
+    .choice.correct{outline:2px solid rgba(34,197,94,.7);background:rgba(34,197,94,.07)}
+    .choice.wrong{outline:2px solid rgba(239,68,68,.7);background:rgba(239,68,68,.07)}
+    .result{border:1px dashed rgba(255,255,255,.2);padding:10px;border-radius:12px;margin-top:6px;display:none}
+    .result.ok{display:block;background:rgba(34,197,94,.08)} .result.ng{display:block;background:rgba(239,68,68,.08)}
+    .explain{background:#0b1225;border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--accent);padding:12px;border-radius:12px;margin-top:10px;white-space:pre-wrap;color:#dbeafe}
+    .badge{display:inline-flex;gap:6px;align-items:center;background:#172554;border:1px solid rgba(14,165,233,.4);color:#c7e7ff;font-size:12px;border-radius:999px;padding:4px 8px;margin-right:6px}
+    .nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(11,16,32,.9);backdrop-filter:blur(6px);border-top:1px solid rgba(255,255,255,.06)}
+    .nav-inner{max-width:980px;margin:0 auto;padding:10px 14px;display:flex;gap:10px}
+    .nav .btn{flex:1;justify-content:center} .btn.primary{background:linear-gradient(180deg,#0284c7,#0ea5e9)} .btn.secondary{background:#1f2937}
+    .hidden{display:none} .error{color:#fecaca}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="h-inner">
+      <div class="title">RCCM 問題4-2 <span class="muted" style="font-size:12px">JSON版（堅牢）</span></div>
+      <div class="subtitle" id="subtitle">過去問題で実力アップ！（データ読込中…）</div>
+      <div class="toolbar">
+        <div class="select"><span class="muted">年度：</span><select id="yearSelect"></select></div>
+        <button class="btn" id="resetBtn">リセット</button>
+        <div class="stats"><span id="counter">問題 0 / 0</span><span>|</span><span id="accuracy">正解率 0%</span></div>
+      </div>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="pill" id="yearTag">年度</div>
+    <div class="card">
+      <div class="q-head">
+        <div class="q-num" id="qNumber">問題</div>
+        <div class="badge hidden" id="badgeErrata">出題注意</div>
+        <div class="badge hidden" id="badgeMulti">複数正解</div>
+      </div>
+      <div class="q-text" id="qText">問題文を読み込み中…</div>
+    </div>
+    <button class="choice" id="choiceA"><span class="label">a.</span><span class="text"></span></button>
+    <button class="choice" id="choiceB"><span class="label">b.</span><span class="text"></span></button>
+    <button class="choice" id="choiceC"><span class="label">c.</span><span class="text"></span></button>
+    <button class="choice" id="choiceD"><span class="label">d.</span><span class="text"></span></button>
+    <div class="result" id="resultBox"><strong id="resultTitle">結果</strong><div class="muted" id="resultHint"></div></div>
+    <div class="explain hidden" id="explainBox"></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-inner">
+      <button class="btn secondary" id="prevBtn">← 前の問題</button>
+      <button class="btn primary" id="nextBtn">次の問題 →</button>
+    </div>
+  </nav>
+
+  <script>
+    const storeKey = "rccm_training_v1";
+    let data=[], filtered=[], cursor=0, progress={};
+
+    function saveProgress(){ try{localStorage.setItem(storeKey, JSON.stringify(progress));}catch(e){} }
+    function loadProgress(){ try{progress = JSON.parse(localStorage.getItem(storeKey)||"{}");}catch(e){progress={};} }
+    function setText(el, t){ el.textContent = t; }
+    function computeStats(){
+      const ids = filtered.map(i=>data[i].id); let answered=0, ok=0;
+      ids.forEach(id=>{const p=progress[id]; if(p&&p.answered){answered++; if(p.correct) ok++;}});
+      const acc = answered? Math.round(100*ok/answered):0;
+      setText(document.getElementById('counter'), `問題 ${Math.min(cursor+1,filtered.length)} / ${filtered.length}`);
+      setText(document.getElementById('accuracy'), `正解率 ${acc}%`);
+    }
+    function updateYearTag(item){ setText(document.getElementById('yearTag'), item?.era_year || ''); }
+    function renderQuestion(){
+      const item = data[filtered[cursor]];
+      if(!item){ setText(document.getElementById('qText'),'問題データがありません'); return; }
+      const multi=(item.correct||'').split('|').filter(Boolean);
+      document.getElementById('badgeMulti').classList.toggle('hidden', multi.length<=1);
+      const nf=(item.notes_flag||'').toUpperCase(); const hasErrata=nf.includes('ERRATA')||nf.includes('AMBIGUOUS');
+      document.getElementById('badgeErrata').classList.toggle('hidden', !hasErrata);
+      setText(document.getElementById('qNumber'), `問題 ${item.q_no}`);
+      document.getElementById('qText').textContent = item.question || "";
+      document.querySelector('#choiceA .text').textContent = item.option_a || "";
+      document.querySelector('#choiceB .text').textContent = item.option_b || "";
+      document.querySelector('#choiceC .text').textContent = item.option_c || "";
+      document.querySelector('#choiceD .text').textContent = item.option_d || "";
+      document.getElementById('explainBox').classList.add('hidden');
+      document.getElementById('explainBox').textContent = item.explanation || "";
+      document.getElementById('resultBox').classList.remove('ok','ng'); document.getElementById('resultBox').style.display='none';
+      ['A','B','C','D'].forEach(ch=>{const el=document.getElementById('choice'+ch); el.classList.remove('correct','wrong'); el.disabled=false;});
+      updateYearTag(item); computeStats();
+      const prev = progress[item.id]; if(prev&&prev.answered){ revealAnswer(prev.choice); }
+    }
+    function revealAnswer(chosen){
+      const item=data[filtered[cursor]]; const correctSet=new Set((item.correct||"").toLowerCase().split('|').filter(Boolean));
+      ['a','b','c','d'].forEach(ch=>{const el=document.getElementById('choice'+ch.toUpperCase()); el.classList.toggle('correct', correctSet.has(ch)); el.classList.toggle('wrong', chosen&&(chosen===ch)&&!correctSet.has(ch)); el.disabled=true;});
+      const ok=correctSet.has(chosen); const box=document.getElementById('resultBox'); box.style.display='block'; box.classList.toggle('ok', ok); box.classList.toggle('ng', !ok);
+      document.getElementById('resultTitle').textContent = ok? "✅ 正解！":"❌ 不正解";
+      document.getElementById('resultHint').textContent = ok? "":`正解は ${Array.from(correctSet).join(" / ")} です。`;
+      const exp=document.getElementById('explainBox'); if((item.explanation||"").trim()!==""){ exp.classList.remove('hidden'); }
+      progress[item.id]={answered:true, correct:ok, choice:chosen}; saveProgress(); computeStats();
+    }
+    function onChoice(letter){ return ()=> revealAnswer(letter); }
+    function applyFilter(){
+      const selVal=document.getElementById('yearSelect').value; filtered=[];
+      for(let i=0;i<data.length;i++){ if(selVal==="ALL" || data[i].era_year===selVal) filtered.push(i); }
+      cursor=0; renderQuestion();
+    }
+    function populateYears(){
+      const pairs=data.map(d=>({era:d.era_year,y:d.year_western})); const uniq=new Map(); pairs.forEach(p=>{ if(!uniq.has(p.era)) uniq.set(p.era, p.y); });
+      const years=Array.from(uniq.entries()).sort((a,b)=>(a[1]||0)-(b[1]||0)).map(x=>x[0]);
+      const sel=document.getElementById('yearSelect'); sel.innerHTML=""; const o0=document.createElement('option'); o0.value="ALL"; o0.textContent="全年度"; sel.appendChild(o0);
+      years.forEach(era=>{const o=document.createElement('option'); o.value=era; o.textContent=era; sel.appendChild(o);});
+      sel.value = localStorage.getItem(storeKey+"_filter") || "ALL"; sel.addEventListener('change', ()=>{ localStorage.setItem(storeKey+"_filter", sel.value); applyFilter(); });
+      const ys=data.map(d=>d.year_western).filter(Boolean).sort((a,b)=>a-b); const minY=ys[0], maxY=ys[ys.length-1];
+      const range=(minY&&maxY)?`（平成${minY-1988}年度〜${maxY>=2019?"令和"+(maxY-2018)+"年度":"平成"+(maxY-1988)+"年度"}）`:"";
+      setText(document.getElementById('subtitle'), `過去問題で実力アップ！ ${range}`);
+    }
+
+    async function tryLoad(url){
+      const t = Date.now();
+      const res = await fetch(url + (url.includes('?')?'&':'?') + 'ts=' + t, {cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP ' + res.status + ' on ' + url);
+      const text = await res.text();
+      try{
+        const payload = JSON.parse(text);
+        return payload;
+      }catch(e){
+        throw new Error('JSON parse error on ' + url + ' :: ' + e.message);
+      }
+    }
+
+    async function bootstrap(){
+      loadProgress();
+      const base = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname.replace(/[^/]+$/, '');
+      const candidates = [
+        './rccm_data.json',
+        base + 'rccm_data.json',
+        '/rccm_data.json'
+      ];
+      let lastErr = null, usedUrl = null;
+      for(const cand of candidates){
+        try{
+          const payload = await tryLoad(cand);
+          data = payload.items || [];
+          usedUrl = cand;
+          break;
+        }catch(e){
+          lastErr = e;
+          console.warn('failed url', cand, e);
+        }
+      }
+      if(!data.length){
+        const sub=document.getElementById('subtitle');
+        sub.innerHTML = "データの読み込みに失敗しました。<br><span class='error'>rccm_data.json を index.html と同じフォルダに置いてください。</span><br><small>" + (lastErr? String(lastErr):'unknown') + "</small><br><small>試行URL: " + candidates.join(' , ') + "</small>";
+        document.getElementById('qText').textContent = "読み込みエラー";
+        return;
+      }
+      populateYears();
+      document.getElementById('choiceA').addEventListener('click', onChoice('a'));
+      document.getElementById('choiceB').addEventListener('click', onChoice('b'));
+      document.getElementById('choiceC').addEventListener('click', onChoice('c'));
+      document.getElementById('choiceD').addEventListener('click', onChoice('d'));
+      document.getElementById('prevBtn').addEventListener('click', ()=>{ if(cursor>0){cursor--; renderQuestion();} });
+      document.getElementById('nextBtn').addEventListener('click', ()=>{ if(cursor<filtered.length-1){cursor++; renderQuestion();} });
+      document.getElementById('resetBtn').addEventListener('click', ()=>{ if(confirm("進捗（回答履歴）をリセットしますか？")){ progress={}; saveProgress(); computeStats(); }});
+      applyFilter();
+      // Show the actual URL used (debug)
+      const sub=document.getElementById('subtitle');
+      sub.innerHTML += " <small class='muted'>(データ: " + usedUrl + ")</small>";
+    }
+    bootstrap();
+  </script>
+</body>
+</html>
