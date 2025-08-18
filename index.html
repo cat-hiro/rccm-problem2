@@ -7,10 +7,16 @@
 <style>
   [hidden]{display:none!important}
   :root{--bg:#f6f9ff;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#2563eb;--ok:#16a34a;--bad:#ef4444;--radius:16px;--shadow:0 10px 30px rgba(0,0,0,.08)}
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,#f6f9ff,#eef4ff 40%,#f6f9ff);color:var(--ink);
-       font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,"Noto Sans JP",sans-serif;
-       padding-bottom:calc(76px + env(safe-area-inset-bottom)); overflow:auto}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#f6f9ff,#eef4ff 40%,#f6f9ff);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,"Noto Sans JP",sans-serif;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom));
+    overflow:auto;
+  }
   .wrap{min-height:100vh;display:flex;flex-direction:column}
   header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.7);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
   .container{max-width:960px;margin:0 auto;padding:12px 16px}
@@ -20,27 +26,34 @@
   .kpi b{color:var(--ink)}
   select,button{appearance:none;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 12px;font-weight:600}
   select{padding-right:28px}
-  main{flex:1}.inner{max-width:960px;margin:14px auto;padding:0 16px}
+  main{flex:1}
+  .inner{max-width:960px;margin:14px auto;padding:0 16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:12px}
   .meta{display:flex;align-items:center;justify-content:space-between;color:var(--muted);flex-wrap:wrap;gap:6px}
-  .qwrap{display:flex;gap:12px}.qleft{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+  .qwrap{display:flex;gap:12px}
+  .qleft{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
   .qtext{padding:10px;border:1px solid var(--line);border-radius:12px;background:#fafcff;line-height:1.7;white-space:pre-wrap;word-break:break-word}
   .imgbox{display:none;justify-content:center}
   .imgbox img{max-width:100%;height:auto;max-height:min(42vh,560px);border:1px solid var(--line);border-radius:12px;background:#fff;object-fit:contain}
   .choices{display:flex;flex-direction:column;gap:10px}
   .choice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px;background:#f8fbff;cursor:pointer}
-  .choice:hover{outline:2px solid rgba(37,99,235,.15)} .choice.disabled{opacity:.7;cursor:default}
+  .choice:hover{outline:2px solid rgba(37,99,235,.15)}
+  .choice.disabled{opacity:.7;cursor:default}
   .bullet{min-width:26px;height:26px;display:inline-grid;place-items:center;border-radius:999px;border:1px solid #cbd5e1;color:#1f2937;font-weight:700}
   .ctext{text-align:left;flex:1;white-space:pre-wrap;word-break:break-word}
-  .result{font-weight:700}.result.ok{color:var(--ok)}.result.bad{color:var(--bad)}
+  .result{font-weight:700}
+  .result.ok{color:var(--ok)}
+  .result.bad{color:var(--bad)}
   .explain details{border-top:1px dashed var(--line);padding-top:8px}
   .explain summary{cursor:pointer;list-style:none;font-weight:700;color:#1f4ed8}
   .explain summary::-webkit-details-marker{display:none}
   .exbody{padding-bottom:calc(76px + env(safe-area-inset-bottom));white-space:pre-wrap;word-break:break-word;color:var(--muted);margin-top:8px;line-height:1.7}
   footer{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border-top:1px solid var(--line)}
   .bar{max-width:960px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px}
-  .spacer{flex:1}.btn-primary{background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;border-color:#2563eb}
-  .btn-ghost{background:#fff}.btn-danger{border-color:#fecaca;background:#fff0f0;color:#b91c1c}
+  .spacer{flex:1}
+  .btn-primary{background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;border-color:#2563eb}
+  .btn-ghost{background:#fff}
+  .btn-danger{border-color:#fecaca;background:#fff0f0;color:#b91c1c}
   #imgModal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100}
   #imgModal img{max-width:96vw;max-height:92vh;background:#fff;border-radius:12px}
 </style>
@@ -50,58 +63,76 @@
   <header>
     <div class="container">
       <div class="row">
-        <div class="kpi" id="kpiLeft"><span>年度</span><select id="yearFilter"></select></div>
+        <div class="kpi" id="kpiLeft">
+          <span>年度</span>
+          <select id="yearFilter"></select>
+        </div>
         <div class="title">RCCM 問題2</div>
         <div class="kpi" id="kpiRight">
-          <span id="counter">0 / 0</span><span>正解率 <b id="rate">0%</b></span>
+          <span id="counter">0 / 0</span>
+          <span>正解率 <b id="rate">0%</b></span>
           <button id="resetBtn" class="btn-danger">リセット</button>
         </div>
       </div>
     </div>
   </header>
 
-  <main><div class="inner">
-    <div id="card" class="card" hidden>
-      <div class="meta"><div id="meta"></div><div id="metaR"></div></div>
-      <div class="qwrap"><div class="qleft">
-        <div id="q" class="qtext"></div>
-        <div class="imgbox" id="imgwrap"><img id="qimg" alt=""></div>
-        <div id="choices" class="choices"></div>
-        <div id="result" class="result"></div>
-        <div id="explain" class="explain"></div>
-      </div></div>
+  <main>
+    <div class="inner">
+      <div id="card" class="card" hidden>
+        <div class="meta"><div id="meta"></div><div id="metaR"></div></div>
+        <div class="qwrap">
+          <div class="qleft">
+            <div id="q" class="qtext"></div>
+            <div class="imgbox" id="imgwrap"><img id="qimg" alt=""></div>
+            <div id="choices" class="choices"></div>
+            <div id="result" class="result"></div>
+            <div id="explain" class="explain"></div>
+          </div>
+        </div>
+      </div>
+      <div id="loading" class="card">読み込み中…</div>
     </div>
-    <div id="loading" class="card">読み込み中…</div>
-  </div></main>
+  </main>
 
-  <footer><div class="bar">
-    <button id="prevBtn" class="btn-ghost">前の問題</button>
-    <div class="spacer"></div>
-    <button id="nextBtn" class="btn-primary">次の問題</button>
-  </div></footer>
+  <footer>
+    <div class="bar">
+      <button id="prevBtn" class="btn-ghost">前の問題</button>
+      <div class="spacer"></div>
+      <button id="nextBtn" class="btn-primary">次の問題</button>
+    </div>
+  </footer>
 </div>
 
+<!-- 画像フルスクリーン -->
 <div id="imgModal"><img alt=""></div>
 
-<!-- 集約配列 -->
+<!-- グローバル配列（すべてのチャンクが push する） -->
 <script>window.PROBLEMS_CHUNKS = window.PROBLEMS_CHUNKS || [];</script>
 
-<!-- 問題2のみ読み込む -->
+<!-- 問題2（4分割）を同期読み込み -->
 <script>
 (function(){
-  const files=['problems2_chunk1_of4.js','problems2_chunk2_of4.js','problems2_chunk3_of4.js','problems2_chunk4_of4.js'];
+  const files=[
+    'problems2_chunk1_of4.js',
+    'problems2_chunk2_of4.js',
+    'problems2_chunk3_of4.js',
+    'problems2_chunk4_of4.js'
+  ];
   const status=[]; let left=files.length;
   function done(){ if(--left===0) window.dispatchEvent(new Event('chunks:ready')); }
   files.forEach(f=>{
-    const s=document.createElement('script'); s.src=f; s.async=false;
-    s.onload=()=>{status.push(['✅',f]); done();};
-    s.onerror=()=>{status.push(['❌',f]); done();};
+    const s=document.createElement('script');
+    s.src=f; s.async=false;
+    s.onload=()=>{ status.push(['✅',f]); done(); };
+    s.onerror=()=>{ status.push(['❌',f]); done(); };
     document.head.appendChild(s);
   });
-  window.__chunk_status=status;
+  window.__chunk_status=status; // デバッグ用
 })();
 </script>
 
+<!-- アプリ本体 -->
 <script>
 (function(){
   const $=s=>document.querySelector(s);
@@ -118,8 +149,7 @@
   const STORAGE_INDEX='rccm2_index_v2';
 
   let correctSet=new Set(JSON.parse(localStorage.getItem(STORAGE_CORRECT)||'[]'));
-  let ALL=[]; let ORDER=[]; let IDX=0; let current=null;
-  let didInit=false;
+  let ALL=[]; let ORDER=[]; let IDX=0; let current=null; let didInit=false;
 
   function normalize(q){
     return {
@@ -132,12 +162,13 @@
       choices:Array.isArray(q.choices)? q.choices.map(String):[],
       correct:Number.isInteger(q.correct)? q.correct : -1,
       explanation:String(q.explanation ?? '')
-    }
+    };
   }
 
   function loadProblems(){
     const src=Array.isArray(window.PROBLEMS_CHUNKS)? window.PROBLEMS_CHUNKS: [];
     const all=[]; for(const ch of src){ if(Array.isArray(ch)) all.push(...ch); }
+    // 重複除去（id単位）
     const map=new Map();
     for(const raw of all){
       const n=normalize(raw); const key=n.id || `${n.year}-${n.number}`;
@@ -150,11 +181,18 @@
     const ys=[...new Set(ALL.map(x=>x.year))].sort((a,b)=>a-b);
     const map=new Map(ALL.map(x=>[x.year,x.yearDisplay]));
     yearFilter.innerHTML='';
-    const opA=document.createElement('option'); opA.value=''; opA.textContent='全年度';
-    yearFilter.appendChild(opA);
-    ys.forEach(y=>{ const op=document.createElement('option'); op.value=String(y); op.textContent=map.get(y)||y; yearFilter.appendChild(op); });
+    const opAll=document.createElement('option'); opAll.value=''; opAll.textContent='全年度';
+    yearFilter.appendChild(opAll);
+    ys.forEach(y=>{
+      const op=document.createElement('option');
+      op.value=String(y); op.textContent=map.get(y)||y;
+      yearFilter.appendChild(op);
+    });
     yearFilter.value=localStorage.getItem('rccm2_year')||'';
-    yearFilter.addEventListener('change',()=>{ localStorage.setItem('rccm2_year',yearFilter.value); makeOrder(true); showAt(0); });
+    yearFilter.addEventListener('change',()=>{
+      localStorage.setItem('rccm2_year',yearFilter.value);
+      makeOrder(true); showAt(0);
+    });
   }
 
   function filteredPool(){
@@ -163,21 +201,24 @@
     if(y) pool=pool.filter(q=>String(q.year)===y);
     return pool;
   }
+
   function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 
   function makeOrder(save){
-    ORDER=shuffle(filteredPool().map(q=>q.id)); IDX=0;
+    ORDER=shuffle(filteredPool().map(q=>q.id));
+    IDX=0;
     if(save){
       localStorage.setItem(STORAGE_ORDER,JSON.stringify(ORDER));
-      localStorage.setItem(STORAGE_INDEX, String(IDX)); /* ← 修正ポイント */
+      localStorage.setItem(STORAGE_INDEX,String(IDX)); // ← 文字列で保存（復元時のズレ防止）
     }
     updateKPI();
   }
 
   function normalizeDataUri(src){
     if(!src) return '';
+    // PDF→画像抽出などで出がちな MIME を修正
     if(src.startsWith('data:image/page')){
-      if(src.includes('.png;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/png;base64,');
+      if(src.includes('.png;base64,'))  return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/png;base64,');
       if(src.includes('.jpeg;base64,') || src.includes('.jpg;base64,')) return src.replace(/^data:image\/page[^;]*;base64,/,'data:image/jpeg;base64,');
     }
     return src;
@@ -195,12 +236,18 @@
     qEl.textContent=q.question;
 
     const src=normalizeDataUri(q.image||'').trim();
-    if(src){ imgEl.onerror=()=>{imgEl.removeAttribute('src'); imgWrap.style.display='none';}; imgEl.src=src; imgWrap.style.display='flex'; }
-    else { imgEl.removeAttribute('src'); imgWrap.style.display='none'; }
+    if(src){
+      imgEl.onerror=()=>{ imgEl.removeAttribute('src'); imgWrap.style.display='none'; };
+      imgEl.src=src; imgWrap.style.display='flex';
+    }else{
+      imgEl.removeAttribute('src'); imgWrap.style.display='none';
+    }
 
+    // 画像タップで拡大
     imgEl.onclick=()=>{ if(!imgEl.src) return; imgModalImg.src=imgEl.src; imgModal.style.display='flex'; };
     imgModal.onclick=()=>{ imgModal.style.display='none'; imgModalImg.src=''; };
 
+    // 選択肢
     choicesEl.innerHTML=''; resultEl.textContent=''; resultEl.className='result'; explainEl.innerHTML='';
     q.choices.forEach((tx,i)=>{
       const div=document.createElement('div'); div.className='choice';
@@ -213,14 +260,22 @@
     updateKPI();
   }
 
-  function lockChoices(){ choicesEl.querySelectorAll('.choice').forEach(el=>{ el.classList.add('disabled'); el.style.pointerEvents='none'; }); }
+  function lockChoices(){
+    choicesEl.querySelectorAll('.choice').forEach(el=>{
+      el.classList.add('disabled'); el.style.pointerEvents='none';
+    });
+  }
+
   function onChoose(i){
     if(!current) return;
-    const ok=(i===current.correct); lockChoices();
+    const ok=(i===current.correct);
+    lockChoices();
     if(ok){
       resultEl.textContent='正解！'; resultEl.className='result ok';
-      correctSet.add(current.id); localStorage.setItem(STORAGE_CORRECT,JSON.stringify([...correctSet]));
-      const pos=ORDER.indexOf(current.id); if(pos>=0){ ORDER.splice(pos,1); if(IDX>=ORDER.length) IDX=Math.max(ORDER.length-1,0); }
+      correctSet.add(current.id);
+      localStorage.setItem(STORAGE_CORRECT,JSON.stringify([...correctSet]));
+      const pos=ORDER.indexOf(current.id);
+      if(pos>=0){ ORDER.splice(pos,1); if(IDX>=ORDER.length) IDX=Math.max(ORDER.length-1,0); }
       localStorage.setItem(STORAGE_ORDER,JSON.stringify(ORDER));
     }else{
       const letter=['a','b','c','d','e','f'][current.correct]||String(current.correct+1);
@@ -236,25 +291,34 @@
   function showAt(i){
     if(!ORDER.length){ render(null); updateKPI(); return; }
     IDX=Math.min(Math.max(i,0),ORDER.length-1);
-    const id=ORDER[IDX]; current=ALL.find(x=>x.id===id)||null;
-    render(current); localStorage.setItem(STORAGE_INDEX,String(IDX));
-  }
-  const prev=()=>{ if(ORDER.length) showAt(IDX-1); };
-  const next=()=>{ if(ORDER.length) showAt(IDX+1); };
-  function resetProgress(){
-    if(confirm('正解済みの記録をリセットしますか？')){
-      correctSet.clear(); localStorage.setItem(STORAGE_CORRECT,'[]'); makeOrder(true); showAt(0);
-    }
-  }
-  function updateKPI(){
-    const total=ALL.length, solved=correctSet.size;
-    rateEl.textContent = total? Math.round(solved/total*100)+'%' : '0%';
-    const n=ORDER.length; counterEl.textContent=`${Math.min(IDX+1,Math.max(n,1))} / ${Math.max(n,1)}`;
-    prevBtn.disabled=(IDX<=0); nextBtn.disabled=(IDX>=ORDER.length-1);
+    const id=ORDER[IDX];
+    current=ALL.find(x=>x.id===id)||null;
+    render(current);
+    localStorage.setItem(STORAGE_INDEX,String(IDX));
   }
 
-  prevBtn.addEventListener('click',()=>{ if(ORDER.length) showAt(IDX-1); });
-  nextBtn.addEventListener('click',()=>{ if(ORDER.length) showAt(IDX+1); });
+  function prev(){ if(ORDER.length) showAt(IDX-1); }
+  function next(){ if(ORDER.length) showAt(IDX+1); }
+
+  function resetProgress(){
+    if(confirm('正解済みの記録をリセットしますか？')){
+      correctSet.clear();
+      localStorage.setItem(STORAGE_CORRECT,'[]');
+      makeOrder(true); showAt(0);
+    }
+  }
+
+  function updateKPI(){
+    const total=ALL.length, solved=correctSet.size;
+    rateEl.textContent= total ? Math.round(solved/total*100)+'%' : '0%';
+    const n=ORDER.length;
+    counterEl.textContent=`${Math.min(IDX+1,Math.max(n,1))} / ${Math.max(n,1)}`;
+    prevBtn.disabled=(IDX<=0);
+    nextBtn.disabled=(IDX>=ORDER.length-1);
+  }
+
+  prevBtn.addEventListener('click',prev);
+  nextBtn.addEventListener('click',next);
   resetBtn.addEventListener('click',resetProgress);
 
   function init(){
@@ -267,12 +331,16 @@
     }
     const st=(window.__chunk_status||[]).map(([m,f])=>`${m} ${f}`).join(' / ');
     loadingEl.textContent=`読込済み: ${st}`;
-    buildYearOptions(); makeOrder(true);
-    try{loadingEl.remove();}catch(e){loadingEl.hidden=true;}
-    cardEl.hidden=false; showAt(0);
+    buildYearOptions();
+    makeOrder(true);
+    try{ loadingEl.remove(); }catch(e){ loadingEl.hidden=true; }
+    cardEl.hidden=false;
+    showAt(0);
   }
+
+  // 全チャンク読込後に初期化
   window.addEventListener('chunks:ready',init);
-  // 念のためのフォールバック（読み込みイベントが飛ばなかった場合）
+  // 念のためのフォールバック
   window.addEventListener('DOMContentLoaded',()=>setTimeout(init,3000));
 })();
 </script>
